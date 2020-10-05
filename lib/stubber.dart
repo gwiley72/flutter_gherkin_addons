@@ -1,11 +1,11 @@
 import 'dart:collection';
 import 'dart:io';
-import 'package:flutter_gherkin_addons/flutter_gherkin_addons.dart';
 import 'package:mock_web_server/mock_web_server.dart';
 
 class Stubber {
   MockWebServer _mockWebServer = MockWebServer(port: 8081);
   HashMap<String, Stub> stubs = HashMap();
+
   start() async {
     await _mockWebServer.start();
     _mockWebServer.dispatcher = _dispatcher;
@@ -37,6 +37,7 @@ class Stubber {
 
   get _defaultAnswer => MockResponse()..httpCode = 404;
 }
+
 typedef Response ResponseBuilder(HttpRequest request);
 class Stub {
   final String url;
@@ -56,6 +57,7 @@ class Response {
 
   Response(this._statusCode, this._body, {this.headers});
 }
+
 class StubFor {
   static Stub staticHttpGet(String url, Response response){
     return _staticStub("GET", url, response);
