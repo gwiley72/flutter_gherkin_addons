@@ -20,13 +20,15 @@ class Stubber {
   }
 
   _requestToKey(HttpRequest request) {
-    return request.method + ":" + request.uri.toString();
+    return request.method + ':' + request.uri.toString();
   }
 
   Future<MockResponse> _dispatcher(HttpRequest request) async {
-    if (stubs.containsKey(_requestToKey(request))) {
-      var _stub = stubs[_requestToKey(request)];
-      var _response=_stub._responseBuilder(request);
+    String key = _requestToKey(request);
+    Stub stub = RequestMatcher.find(key, stubs);
+
+    if (stub != null) {
+      var _response = stub._responseBuilder(request);
       return MockResponse()
         ..httpCode = _response._statusCode
         ..body = _response._body
@@ -38,6 +40,12 @@ class Stubber {
   get _defaultAnswer => MockResponse()..httpCode = 404;
 }
 
+class RequestMatcher {
+  static Stub find(key, HashMap<String, Stub> stubs) {
+    return stubs[key];
+  }
+}
+
 typedef Response ResponseBuilder(HttpRequest request);
 class Stub {
   final String url;
@@ -46,7 +54,7 @@ class Stub {
 
   Stub(this.method, this.url, this._responseBuilder);
   String toKey() {
-    return this.method + ":" + this.url;
+    return this.method + ':' + this.url;
   }
 }
 
@@ -59,38 +67,50 @@ class Response {
 }
 
 class StubFor {
-  static Stub staticHttpGet(String url, Response response){
-    return _staticStub("GET", url, response);
+  static Stub staticHttpGet(String url, Response response) {
+    return _staticStub('GET', url, response);
   }
-  static Stub staticHttpPost(String url, Response response){
-    return _staticStub("POST", url, response);
+
+  static Stub staticHttpPost(String url, Response response) {
+    return _staticStub('POST', url, response);
   }
-  static Stub staticHttpPut(String url, Response response){
-    return _staticStub("PUT", url, response);
+
+  static Stub staticHttpPut(String url, Response response) {
+    return _staticStub('PUT', url, response);
   }
-  static Stub staticHttpPatch(String url, Response response){
-    return _staticStub("PATCH", url, response);
+
+  static Stub staticHttpPatch(String url, Response response) {
+    return _staticStub('PATCH', url, response);
   }
-  static Stub staticHttpDelete(String url, Response response){
-    return _staticStub("DELETE", url, response);
+
+  static Stub staticHttpDelete(String url, Response response) {
+    return _staticStub('DELETE', url, response);
   }
-  static Stub _staticStub(String method, String url, Response response){
-    return Stub(method, url, (request) {return response;});
+
+  static Stub _staticStub(String method, String url, Response response) {
+    return Stub(method, url, (request) {
+      return response;
+    });
   }
-  static Stub httpGet(String url, ResponseBuilder responseBuilder){
-    return Stub("GET", url, responseBuilder);
+
+  static Stub httpGet(String url, ResponseBuilder responseBuilder) {
+    return Stub('GET', url, responseBuilder);
   }
-  static Stub httpPost(String url, ResponseBuilder responseBuilder){
-    return Stub("POST", url, responseBuilder);
+
+  static Stub httpPost(String url, ResponseBuilder responseBuilder) {
+    return Stub('POST', url, responseBuilder);
   }
-  static Stub httpPut(String url, ResponseBuilder responseBuilder){
-    return Stub("PUT", url, responseBuilder);
+
+  static Stub httpPut(String url, ResponseBuilder responseBuilder) {
+    return Stub('PUT', url, responseBuilder);
   }
-  static Stub httpPatch(String url, ResponseBuilder responseBuilder){
-    return Stub("PATCH", url, responseBuilder);
+
+  static Stub httpPatch(String url, ResponseBuilder responseBuilder) {
+    return Stub('PATCH', url, responseBuilder);
   }
-  static Stub httpDelete(String url, ResponseBuilder responseBuilder){
-    return Stub("DELETE", url, responseBuilder);
+
+  static Stub httpDelete(String url, ResponseBuilder responseBuilder) {
+    return Stub('DELETE', url, responseBuilder);
   }
 
 }
